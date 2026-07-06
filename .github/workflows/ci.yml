@@ -1,0 +1,38 @@
+# The console core (verify-detached -> receipt -> review queue) is proven against
+# the genesis kernel directly, so CI needs only the kernel + pytest -- no spoke.
+name: ci
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          path: axm-console
+
+      # The genesis kernel is the console's only dependency (the shared trust
+      # root). Pinned to the v1.0.0 release commit the whole ecosystem uses.
+      - uses: actions/checkout@v4
+        with:
+          repository: BigBirdReturns/axm-genesis
+          ref: 9074e7fb2e9cedde692b248cdd0c6a805e77d8ac
+          path: axm-genesis
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install kernel and console
+        run: |
+          python -m pip install --upgrade pip
+          pip install './axm-genesis[mldsa-compat]'
+          pip install -e './axm-console' --no-deps
+          pip install pytest
+
+      - name: Tests (verify-detached, receipt, review queue)
+        working-directory: axm-console
+        run: python -m pytest tests/ -q
