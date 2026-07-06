@@ -31,7 +31,7 @@ see the punch list.)*
 | `ScreenGhost` | intake & operation (pixel_capture; interface procedures on real Chromium) | yes |
 | `GhostBox` | attention & review (custody seam, observers, human review) | yes |
 | `axm-embodied` | physical liability (Flash Freeze recorder; frame capture → physical_capture) | yes |
-| `axm-console` | **the seat** — `axm capture/operate/verify/queue/review`, all 4 surfaces driven | yes |
+| `axm-console` | **the seat** — `axm capture/operate/verify/queue/review/ask`, all 5 surfaces driven | yes |
 | `axm-chat` | conversation spoke (`import` → sealed `chat/conversation` shards); GhostBox edge wired | yes |
 
 Separate repos are a deliberate cost: they make the sovereignty boundary a *hard
@@ -42,9 +42,11 @@ soften that wall — a real downgrade here.
 ## What's DONE (merged)
 
 - All five spokes + the console, one custody chain, every record verifies detached.
-- Console: all four surfaces **driven** (`camera-frames`, `screenshot`,
-  `interface-procedure` on real Chromium, `foundry-export` on a sim S3 surface).
-  CI drives `camera-frames` for real.
+- Console: all five surfaces **driven** (`camera-frames`, `screenshot`,
+  `interface-procedure` on real Chromium, `foundry-export` on a sim S3 surface,
+  `ontology-exit` on Foundry Ontology API v2 wire shapes). CI drives
+  `camera-frames` for real. `axm ask` is the seat's first READ verb —
+  verify-gated querying (SQL or NL) of any sealed shard through Spectra.
 - Honesty pass done: synthesized screenshot labeled `synthesized_sample` (not a
   fake `manual_screenshot`); `KERNEL_ABSENT` receipt degrades instead of crashing;
   the operator map is durable and rebuilt from real state.
@@ -112,14 +114,16 @@ pip install 'git+https://github.com/BigBirdReturns/axm-genesis.git@9074e7fb2e9ce
 #  suite and the 17-test console suite run this way — verified 2026-07-06)
 
 # console: core tests need only the kernel; driver tests need the spokes checked out
-cd axm-console && python -m pytest tests/ -q      # 10 core pass; 5 driver tests skip w/o spokes
+cd axm-console && python -m pytest tests/ -q      # 12 core pass; 8 driver/ask tests skip w/o spokes
 AXM_EMBODIED_REPO=/path/to/axm-embodied \
 AXM_SCREENGHOST_REPO=/path/to/screenghost \
-AXM_CORE_REPO=/path/to/axm-core python -m pytest tests/ -q   # all 17
+AXM_CORE_REPO=/path/to/axm-core python -m pytest tests/ -q   # all 20
 
 # drive a surface end to end:
 axm surfaces
 axm capture camera-frames
+axm capture ontology-exit
+axm ask <shard_dir> --key <pub> --sql "SELECT DISTINCT label FROM entities WHERE entity_type = 'object_type'"
 axm queue
 axm review <sh1_id> --by you --as escalate
 ```

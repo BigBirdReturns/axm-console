@@ -4,6 +4,8 @@
     axm capture <surface> [-p k=v ...] drive a surface to a sealed, verified record
     axm operate <surface> [-p k=v ...] (alias of capture, for operation surfaces)
     axm verify <shard_dir> --key <pub> verify ANY sealed shard, print its receipt
+    axm ask <shard_dir> --key <pub> [--sql "SELECT ..."] [question]
+                                        verify-gated query of any sealed shard
     axm queue                          show your review queue
     axm review <shard_id> --by <name> --as <escalate|dismiss|needs_context> [--note ..]
 """
@@ -14,6 +16,7 @@ import os
 import sys
 from pathlib import Path
 
+from .ask import ask, render_table
 from .console import Console
 from .surfaces import Status, all_surfaces
 
@@ -56,6 +59,8 @@ def _do_capture(args) -> int:
     print(receipt.render())
     if receipt.verified:
         print("\nadmitted to your review queue.  run:  axm queue")
+        if receipt.trusted_key_path:
+            print(f"ask it:  axm ask {receipt.shard_dir} --key {receipt.trusted_key_path}")
     return 0 if receipt.verified else 1
 
 
@@ -64,6 +69,20 @@ def cmd_verify(args) -> int:
     receipt = console.verify_shard(args.shard_dir, args.key)
     print(receipt.render())
     return 0 if receipt.verified else 1
+
+
+def cmd_ask(args) -> int:
+    if not args.key:
+        print("REFUSED: the console never queries an unverified shard; "
+              "supply --key <out-of-band trusted public key>.", file=sys.stderr)
+        return 2
+    try:
+        result = ask(args.shard_dir, args.key, sql=args.sql, question=args.question)
+    except Exception as e:
+        print(f"FAILED: {e}", file=sys.stderr)
+        return 1
+    print(render_table(result["columns"], result["rows"], result["shard_id"]))
+    return 0
 
 
 def cmd_queue(_args) -> int:
@@ -99,6 +118,19 @@ def build_parser() -> argparse.ArgumentParser:
     pv.add_argument("--key", required=True, help="out-of-band trusted public key")
     pv.set_defaults(fn=cmd_verify)
 
+    pa = sub.add_parser("ask", help="verify-gated query of any sealed shard through Spectra")
+    pa.add_argument("shard_dir")
+    pa.add_argument("--key", default=None,
+                    help="out-of-band trusted public key (required — the console never "
+                         "queries an unverified shard)")
+    pa.add_argument("--sql", default=None, help="raw SQL query, run in place of a free-text question")
+    pa.set_defaults(fn=cmd_ask, question=None)
+    # QUESTION is a free-text positional taken after --key/--sql: argparse's
+    # positional matcher greedily starves a nargs='?' positional that sits
+    # after a required one once an optional interrupts them (a long-standing
+    # argparse limitation), so it is collected from parse_known_args()'s
+    # leftovers in main() instead of declared as a second positional here.
+
     sub.add_parser("queue", help="show your review queue").set_defaults(fn=cmd_queue)
 
     pr = sub.add_parser("review", help="record a human review decision")
@@ -112,7 +144,13 @@ def build_parser() -> argparse.ArgumentParser:
 
 
 def main(argv=None) -> int:
-    args = build_parser().parse_args(argv)
+    parser = build_parser()
+    args, extras = parser.parse_known_args(argv)
+    if extras:
+        if args.cmd == "ask":
+            args.question = " ".join(extras)
+        else:
+            parser.error(f"unrecognized arguments: {' '.join(extras)}")
     return args.fn(args)
 
 
