@@ -136,18 +136,21 @@ def test_queue_is_append_only(tmp_path):
 # ── surfaces: honest driven-vs-declared ──────────────────────────────────
 
 
-def test_surface_registry_is_honest():
+def test_surface_registry_is_all_driven():
     names = {s.name for s in all_surfaces()}
     assert {"camera-frames", "screenshot", "interface-procedure", "foundry-export"} <= names
-    assert get("camera-frames").status is Status.DRIVEN
-    assert get("screenshot").status is Status.DECLARED
+    assert all(get(n).status is Status.DRIVEN for n in names)  # every surface now driven
 
 
-def test_declared_surface_refuses_rather_than_faking(tmp_path):
-    from axm_console.surfaces import SurfaceRun
+def test_a_declared_surface_would_refuse_rather_than_fake(tmp_path):
+    # The refusal contract still holds for any future DECLARED surface: it raises
+    # rather than faking a capture.
+    from axm_console.surfaces import Status, Surface, SurfaceRun
 
+    declared = Surface(name="future-x", verb="capture", owner_repo="axm-future",
+                       tier="future_tier", status=Status.DECLARED, summary="not wired")
     with pytest.raises(NotImplementedError, match="DECLARED, not driven"):
-        get("screenshot").run(SurfaceRun("screenshot", tmp_path, {}))
+        declared.run(SurfaceRun("future-x", tmp_path, {}))
 
 
 # ── end to end through the Console object ────────────────────────────────
