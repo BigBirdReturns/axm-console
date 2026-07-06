@@ -41,7 +41,7 @@ def kernel_available() -> bool:
 class Receipt:
     """What one sealed record is, and that it holds without anyone's platform."""
 
-    shard_id: str
+    shard_id: Optional[str]  # genesis-derived; None only when the kernel is absent
     shard_dir: str
     status: VerifyStatus
     evidence_tier: Optional[str]
@@ -80,7 +80,7 @@ class Receipt:
         for lim in self.tier_limits:
             lines.append(f"              · {lim}")
         lines += [
-            f"  shard id  {self.shard_id}",
+            f"  shard id  {self.shard_id or '(unavailable — kernel absent)'}",
             f"  suite     {self.suite or '?'}",
             f"  sealed    {self.sealed_at or '?'}",
             f"  verify    {tick}",
@@ -113,11 +113,27 @@ def _detached_verify(shard_dir: Path, trusted_key: Optional[Path]) -> VerifyStat
     return VerifyStatus.FAIL
 
 
-def _derive_shard_id(shard_dir: Path) -> str:
-    """Genesis derives custody identity; the console never mints it."""
-    from axm_verify.crypto import derive_shard_id  # the shared root, lazily
+def _derive_shard_id(shard_dir: Path) -> Optional[str]:
+    """Genesis derives custody identity; the console never mints it.
 
-    return derive_shard_id((shard_dir / "manifest.json").read_bytes())
+    Resilient to a kernel-absent environment: prefer the genesis function, fall
+    back to the SAME derivation genesis uses (``sh1_`` + BLAKE3 of the manifest
+    bytes), and to ``None`` if even that is unavailable — so a receipt can still
+    be built (and honestly marked KERNEL_ABSENT) instead of crashing.
+    """
+    manifest_bytes = (shard_dir / "manifest.json").read_bytes()
+    try:
+        from axm_verify.crypto import derive_shard_id  # the shared root, lazily
+
+        return derive_shard_id(manifest_bytes)
+    except Exception:
+        pass
+    try:
+        import blake3
+
+        return "sh1_" + blake3.blake3(manifest_bytes).hexdigest()
+    except Exception:
+        return None
 
 
 def _read_tier(shard_dir: Path) -> tuple[Optional[str], List[str]]:

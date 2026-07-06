@@ -87,11 +87,23 @@ than faking a run — no Potemkin capture.
 - **The console never mints custody.** `shard_id` is genesis-derived; the console
   reads it, never assigns it.
 
+## Map
+
+[`docs/operators-map.html`](docs/operators-map.html) is a single-page, self-
+contained map of the whole ecosystem — every repository, the shared pattern, the
+tier vocabulary, the four flows, and (honestly) where "proven" stops and "not yet
+deployed" begins. Open it directly or serve it via Pages.
+
 ## Status
 
 v0. Core (verify-detached → receipt → queue) proven against genesis **v1.0.0**;
 **all four surfaces driven end to end** — camera-frames, screenshot,
 interface-procedure (real Chromium), and foundry-export (simulated S3). The
-spoke-independent core suite (10 tests) runs everywhere, including CI; the driver
-integration tests (5) run wherever the spokes are checked out and skip cleanly
-otherwise.
+spoke-independent core suite runs everywhere; **CI now also checks out a spoke and
+drives `camera-frames` for real**, so the cross-repo claim is covered, not just
+proven off-CI. The remaining driver integration tests run wherever their spokes
+are checked out and skip cleanly otherwise.
+
+Honesty fixes on this pass: a no-argument `screenshot` seals a labeled
+`synthesized_sample`, never a fake `manual_screenshot`; a kernel-absent receipt
+degrades gracefully instead of crashing.

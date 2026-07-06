@@ -77,6 +77,18 @@ def test_missing_manifest_is_not_a_shard(tmp_path):
         build_receipt(tmp_path, None)
 
 
+def test_receipt_renders_when_shard_id_unavailable():
+    # KERNEL_ABSENT must degrade gracefully: a receipt with no derivable shard id
+    # still renders and serializes instead of crashing.
+    from axm_console.receipt import Receipt
+
+    r = Receipt(shard_id=None, shard_dir="/x", status=VerifyStatus.KERNEL_ABSENT,
+                evidence_tier=None, tier_limits=[], suite=None, title=None, sealed_at=None)
+    assert not r.verified
+    assert "unavailable" in r.render() and "KERNEL_ABSENT" in r.render()
+    assert r.to_dict()["shard_id"] is None
+
+
 # ── queue: verified-only, attention-only, append-only ────────────────────
 
 
