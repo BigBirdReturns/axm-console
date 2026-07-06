@@ -56,16 +56,24 @@ AXM CUSTODY RECEIPT
 
 | Surface | Verb | Tier | Owner | Status |
 |---|---|---|---|---|
-| `camera-frames` | capture | `physical_capture` | axm-embodied | **driven** — run end to end here |
-| `screenshot` | capture | `pixel_capture` | ScreenGhost | declared |
-| `interface-procedure` | operate | `interface_procedure_trace` | ScreenGhost | declared |
-| `foundry-export` | capture | `sim-foundry-s3` | axm-core | declared |
+| `camera-frames` | capture | `physical_capture` | axm-embodied | **driven** |
+| `screenshot` | capture | `pixel_capture` | ScreenGhost | **driven** |
+| `interface-procedure` | operate | `interface_procedure_trace` | ScreenGhost | **driven** |
+| `foundry-export` | capture | `sim-foundry-s3` | axm-core | **driven** |
 
-**driven** = the console runs the spoke end to end and verifies the result here.
-**declared** = the adapter contract exists and the spoke proves the surface in its
-own repo; wiring the driver into the console is the next step. A declared surface
-**refuses** rather than faking a run — no Potemkin capture. The core still
-verifies any shard those spokes produce, today, via `axm verify`.
+All four surfaces are **driven** — the console runs each spoke end to end and
+verifies the sealed result here. A driver runs the spoke's own proven entry point
+in the spoke's repo context (a subprocess), so the console core never imports a
+spoke; the coupling is confined to the driver. Spoke locations resolve from
+`AXM_EMBODIED_REPO` / `AXM_SCREENGHOST_REPO` / `AXM_CORE_REPO` (with deployment
+defaults), or a per-run `spoke_repo` param.
+
+The refusal contract still stands: any future **declared** surface raises rather
+than faking a run — no Potemkin capture.
+
+> Note: the `foundry-export` bundle does not embed an `evidence_tier` in its
+> manifest, so the console honestly reports its tier as *unstated by the shard*
+> rather than inventing one. The record still verifies detached like the rest.
 
 ## Discipline (inherited, enforced, tested)
 
@@ -82,6 +90,8 @@ verifies any shard those spokes produce, today, via `axm verify`.
 ## Status
 
 v0. Core (verify-detached → receipt → queue) proven against genesis **v1.0.0**;
-the `camera-frames` surface driven end to end; 10/10 tests. Remaining surface
-drivers are declared adapters — the honest next increment, each a thin wrapper
-over a spoke that already passes its own suite.
+**all four surfaces driven end to end** — camera-frames, screenshot,
+interface-procedure (real Chromium), and foundry-export (simulated S3). The
+spoke-independent core suite (10 tests) runs everywhere, including CI; the driver
+integration tests (5) run wherever the spokes are checked out and skip cleanly
+otherwise.
