@@ -1,0 +1,26 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "axm-console"
+version = "0.1.0"
+description = "AXM Operator Console — one seat over the sovereign evidence ecosystem"
+readme = "README.md"
+license = {text = "Apache-2.0"}
+requires-python = ">=3.10"
+# The console core depends ONLY on the genesis kernel (the shared trust root).
+# Surface drivers reach their spokes at runtime; the console never imports a
+# spoke into its own dependency graph.
+dependencies = [
+  "axm-genesis[mldsa-compat] @ git+https://github.com/BigBirdReturns/axm-genesis.git@9074e7fb2e9cedde692b248cdd0c6a805e77d8ac",
+]
+
+[project.scripts]
+axm = "axm_console.cli:main"
+
+[project.optional-dependencies]
+dev = ["pytest>=7.0.0"]
+
+[tool.setuptools.packages.find]
+include = ["axm_console*"]

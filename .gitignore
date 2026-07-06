@@ -1,0 +1,7 @@
+__pycache__/
+*.pyc
+*.egg-info/
+.demo_home/
+.axm-console/
+build/
+dist/
