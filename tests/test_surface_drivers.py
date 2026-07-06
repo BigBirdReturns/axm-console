@@ -48,6 +48,19 @@ def test_screenshot_driven(tmp_path):
 
 
 @pytest.mark.skipif(not SG, reason="ScreenGhost spoke not present")
+def test_synthesized_screenshot_is_labeled_honestly(tmp_path):
+    import json
+
+    # No png_path -> a synthesized placeholder. It must NOT be sealed as a real
+    # manual screenshot; the sealed manifest must say what it is.
+    receipt, shard = Console(tmp_path / "home").run_surface("screenshot", params={"spoke_repo": SG})
+    manifest = json.loads((Path(shard) / "content" / "pixel_capture_manifest.json").read_text())
+    assert manifest["capture_method"] == "synthesized_sample"
+    assert manifest["capture_method"] != "manual_screenshot"
+    assert "synthesized sample" in manifest["source_label"]
+
+
+@pytest.mark.skipif(not SG, reason="ScreenGhost spoke not present")
 def test_interface_procedure_driven(tmp_path):
     try:
         import playwright  # noqa: F401

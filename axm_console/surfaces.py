@@ -131,8 +131,17 @@ def _drive_screenshot(run: SurfaceRun) -> Tuple[Path, Path]:
     out = run.workdir
     out.mkdir(parents=True, exist_ok=True)
     p = run.params
-    png_path = p.get("png_path", "")  # a real screenshot; else a synthesized sample (labeled)
+    png_path = p.get("png_path", "")
     sidecar = {k: p[k] for k in ("url", "page_title", "app_name", "capture_tool") if p.get(k)}
+    # Honesty: a synthesized placeholder must NEVER be sealed as a real capture.
+    # With no png_path we seal a labeled sample; only a real png_path is a real
+    # capture that may carry the operator's capture_method/source_label.
+    if png_path:
+        capture_method = p.get("capture_method", "manual_screenshot")
+        source_label = p.get("source_label", "operator-console")
+    else:
+        capture_method = "synthesized_sample"
+        source_label = "operator-console (synthesized sample, not a real capture)"
     script = f"""
         import json, struct, zlib
         from pathlib import Path
@@ -150,8 +159,8 @@ def _drive_screenshot(run: SurfaceRun) -> Tuple[Path, Path]:
             ihdr = struct.pack(">IIBBBBB", 6, 4, 8, 2, 0, 0, 0)
             raw = b"".join(b"\\x00" + b"\\x22\\x44\\x66"*6 for _ in range(4))
             png = sig + chunk(b"IHDR", ihdr) + chunk(b"IDAT", zlib.compress(raw)) + chunk(b"IEND", b"")
-        capture = build_capture(png, capture_method={p.get("capture_method", "manual_screenshot")!r},
-                                source_label={p.get("source_label", "operator-console")!r},
+        capture = build_capture(png, capture_method={capture_method!r},
+                                source_label={source_label!r},
                                 sidecar={sidecar!r} or None)
         shard = out / "shard"
         sealed = seal_pixel_evidence(png, capture, shard, work_dir=out)

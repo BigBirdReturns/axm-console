@@ -1,5 +1,11 @@
-# The console core (verify-detached -> receipt -> review queue) is proven against
-# the genesis kernel directly, so CI needs only the kernel + pytest -- no spoke.
+# CI runs two layers:
+#  - the spoke-independent console core (verify-detached -> receipt -> review
+#    queue), which needs only the genesis kernel; and
+#  - one real cross-repo drive: axm-embodied is checked out and the
+#    camera-frames surface is driven end to end, so the "you can drive a spoke
+#    from the seat" claim is actually covered, not merely proven off-CI.
+# The other spoke drivers (ScreenGhost, axm-core) still skip cleanly here; a full
+# workspace exercises all four.
 name: ci
 
 on:
@@ -22,6 +28,13 @@ jobs:
           ref: 9074e7fb2e9cedde692b248cdd0c6a805e77d8ac
           path: axm-genesis
 
+      # One spoke, checked out so a real drive runs in CI (pure Python, no
+      # browser). AXM_EMBODIED_REPO points the camera-frames driver at it.
+      - uses: actions/checkout@v4
+        with:
+          repository: BigBirdReturns/axm-embodied
+          path: axm-embodied
+
       - uses: actions/setup-python@v5
         with:
           python-version: "3.11"
@@ -33,6 +46,8 @@ jobs:
           pip install -e './axm-console' --no-deps
           pip install pytest
 
-      - name: Tests (verify-detached, receipt, review queue)
+      - name: Tests (core + one real cross-repo drive)
         working-directory: axm-console
+        env:
+          AXM_EMBODIED_REPO: ${{ github.workspace }}/axm-embodied
         run: python -m pytest tests/ -q

@@ -1,0 +1,373 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AXM · Operator's Map</title>
+<style>
+  :root{
+    --ground:#eceff4; --surface:#ffffff; --surface-2:#f5f7fa;
+    --line:#d3dae3; --line-soft:#e2e7ee;
+    --ink:#141920; --ink-dim:#47525f; --ink-faint:#727d8b;
+    --accent:#1c8175; --accent-deep:#0f5b52; --accent-wash:rgba(28,129,117,.10);
+    --sim:#9c7016; --sim-wash:rgba(156,112,22,.12);
+    --wire:#7c8593; --wire-wash:rgba(124,133,147,.12);
+    --shadow:0 1px 2px rgba(16,24,33,.06),0 8px 28px rgba(16,24,33,.07);
+    --mono:ui-monospace,"SF Mono","JetBrains Mono",Menlo,"Cascadia Code",Consolas,monospace;
+  }
+  @media (prefers-color-scheme: dark){
+    :root{
+      --ground:#0c0f14; --surface:#141a23; --surface-2:#1a212c;
+      --line:#28323f; --line-soft:#1e2732;
+      --ink:#e9edf2; --ink-dim:#9ba7b5; --ink-faint:#65707f;
+      --accent:#35b3a2; --accent-deep:#2a8a7d; --accent-wash:rgba(53,179,162,.12);
+      --sim:#d7a340; --sim-wash:rgba(215,163,64,.12);
+      --wire:#6f7887; --wire-wash:rgba(111,120,135,.14);
+      --shadow:0 1px 2px rgba(0,0,0,.4),0 12px 34px rgba(0,0,0,.34);
+    }
+  }
+  :root[data-theme="light"]{
+    --ground:#eceff4; --surface:#ffffff; --surface-2:#f5f7fa;
+    --line:#d3dae3; --line-soft:#e2e7ee;
+    --ink:#141920; --ink-dim:#47525f; --ink-faint:#727d8b;
+    --accent:#1c8175; --accent-deep:#0f5b52; --accent-wash:rgba(28,129,117,.10);
+    --sim:#9c7016; --sim-wash:rgba(156,112,22,.12);
+    --wire:#7c8593; --wire-wash:rgba(124,133,147,.12);
+    --shadow:0 1px 2px rgba(16,24,33,.06),0 8px 28px rgba(16,24,33,.07);
+  }
+  :root[data-theme="dark"]{
+    --ground:#0c0f14; --surface:#141a23; --surface-2:#1a212c;
+    --line:#28323f; --line-soft:#1e2732;
+    --ink:#e9edf2; --ink-dim:#9ba7b5; --ink-faint:#65707f;
+    --accent:#35b3a2; --accent-deep:#2a8a7d; --accent-wash:rgba(53,179,162,.12);
+    --sim:#d7a340; --sim-wash:rgba(215,163,64,.12);
+    --wire:#6f7887; --wire-wash:rgba(111,120,135,.14);
+    --shadow:0 1px 2px rgba(0,0,0,.4),0 12px 34px rgba(0,0,0,.34);
+  }
+  *{box-sizing:border-box}
+  html{-webkit-text-size-adjust:100%}
+  body{margin:0; background:var(--ground); color:var(--ink);
+    font-family:system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    line-height:1.55; -webkit-font-smoothing:antialiased;}
+  .wrap{max-width:960px; margin:0 auto; padding:0 22px}
+  .mono{font-family:var(--mono)}
+  section{padding:44px 0; border-top:1px solid var(--line-soft)}
+  section:first-of-type{border-top:0}
+  .eyebrow{font-family:var(--mono); font-size:11.5px; letter-spacing:.22em; text-transform:uppercase;
+    color:var(--accent-deep); margin:0 0 14px}
+  h2{font-size:clamp(21px,3.2vw,27px); line-height:1.15; letter-spacing:-.015em; margin:0 0 6px; text-wrap:balance}
+  h3{font-size:16px; letter-spacing:-.01em; margin:0}
+  p{margin:0 0 12px; color:var(--ink-dim); max-width:66ch}
+  p.lead{color:var(--ink); font-size:16.5px; max-width:60ch}
+  strong{color:var(--ink); font-weight:650}
+  em{font-style:normal; color:var(--accent-deep)}
+  header.top{padding:30px 0 6px}
+  .brandrow{display:flex; align-items:baseline; gap:14px; flex-wrap:wrap}
+  .wordmark{font-family:var(--mono); font-weight:700; font-size:15px; letter-spacing:.34em}
+  .wordmark b{color:var(--accent-deep)}
+  .kicker{font-family:var(--mono); font-size:11.5px; letter-spacing:.14em; text-transform:uppercase; color:var(--ink-faint)}
+  .hero{padding:16px 0 8px}
+  .hero h1{font-size:clamp(27px,5vw,45px); line-height:1.06; letter-spacing:-.028em; margin:0 0 18px; text-wrap:balance; font-weight:680}
+  .receipt{margin-top:26px; background:var(--surface); border:1px solid var(--line); border-radius:12px; box-shadow:var(--shadow); overflow:hidden}
+  .receipt .rhead{display:flex; align-items:center; gap:10px; padding:11px 16px; border-bottom:1px dashed var(--line); background:var(--surface-2);
+    font-family:var(--mono); font-size:11px; letter-spacing:.16em; text-transform:uppercase; color:var(--ink-faint)}
+  .receipt .seal{width:9px; height:9px; border-radius:50%; background:var(--accent); box-shadow:0 0 0 3px var(--accent-wash)}
+  .receipt .rbody{padding:15px 16px; font-family:var(--mono); font-size:12.5px; line-height:1.95; overflow-x:auto}
+  .receipt .rbody div{white-space:pre; color:var(--ink-dim)}
+  .receipt .k{color:var(--ink-faint); display:inline-block; width:74px}
+  .receipt .h{color:var(--ink); word-break:break-all}
+  .receipt .ok{color:var(--accent-deep); font-weight:700}
+  .spine{display:flex; align-items:stretch; overflow-x:auto; padding:6px 2px 12px}
+  .step{flex:1 0 auto; min-width:118px; text-align:center; position:relative; padding:0 4px}
+  .step .dot{width:13px; height:13px; border-radius:50%; margin:8px auto 0; background:var(--surface); border:2px solid var(--line); position:relative; z-index:2}
+  .step.seal .dot{border-color:var(--accent); background:var(--accent); box-shadow:0 0 0 4px var(--accent-wash)}
+  .step .bar{position:absolute; top:14px; left:50%; width:100%; height:2px; background:var(--line); z-index:1}
+  .step:last-child .bar{display:none}
+  .step .lab{font-family:var(--mono); font-size:11px; color:var(--ink); margin-top:12px; font-weight:600}
+  .step .sub{font-size:11px; color:var(--ink-faint); margin-top:3px; line-height:1.4}
+  .step.seal .lab{color:var(--accent-deep)}
+  .stamp{display:inline-flex; align-items:center; gap:6px; font-family:var(--mono); font-size:10.5px; letter-spacing:.12em; text-transform:uppercase; font-weight:600;
+    padding:3px 8px; border-radius:5px; border:1px solid; white-space:nowrap}
+  .stamp::before{content:""; width:6px; height:6px; border-radius:50%}
+  .stamp.proven{color:var(--accent-deep); border-color:var(--accent); background:var(--accent-wash)}
+  .stamp.proven::before{background:var(--accent)}
+  .stamp.sim{color:var(--sim); border-color:var(--sim); background:var(--sim-wash)}
+  .stamp.sim::before{background:var(--sim)}
+  .stamp.wire{color:var(--wire); border-color:var(--wire); background:var(--wire-wash)}
+  .stamp.wire::before{background:var(--wire)}
+  .stamp.frozen{color:var(--ink-dim); border-color:var(--line); background:var(--surface-2)}
+  .stamp.frozen::before{background:var(--ink-faint)}
+  .ledger{display:flex; flex-direction:column; gap:12px}
+  .entry{background:var(--surface); border:1px solid var(--line); border-radius:12px; box-shadow:var(--shadow); padding:17px 18px;
+    display:grid; grid-template-columns:150px 1fr; gap:6px 22px; align-items:start}
+  .entry .who{display:flex; flex-direction:column; gap:8px}
+  .entry .repo{font-family:var(--mono); font-size:13px; color:var(--ink); font-weight:650}
+  .entry .role{font-family:var(--mono); font-size:10.5px; letter-spacing:.13em; text-transform:uppercase; color:var(--ink-faint)}
+  .entry .what{margin:0; font-size:14px; color:var(--ink-dim)}
+  .entry .what b{color:var(--ink); font-weight:600}
+  .entry .tags{display:flex; flex-wrap:wrap; gap:7px; margin-top:11px}
+  .entry.seatrow{border-color:var(--accent); box-shadow:0 0 0 1px var(--accent-wash),var(--shadow)}
+  .tiers{display:flex; flex-wrap:wrap; gap:9px}
+  .tier{font-family:var(--mono); font-size:12px; color:var(--ink); background:var(--surface); border:1px solid var(--line); border-radius:7px; padding:7px 11px}
+  .tier span{color:var(--ink-faint); font-size:11px}
+  .caps{display:flex; flex-direction:column; gap:11px}
+  .cap{background:var(--surface); border:1px solid var(--line); border-radius:12px; box-shadow:var(--shadow); padding:16px 18px;
+    display:grid; grid-template-columns:1fr auto; gap:4px 16px; align-items:start}
+  .cap h3{grid-column:1}
+  .cap .stamps{grid-column:2; grid-row:1/3; display:flex; flex-direction:column; gap:6px; align-items:flex-end}
+  .cap p{grid-column:1; margin:0; font-size:13.5px}
+  .cap .flow{font-family:var(--mono); font-size:11.5px; color:var(--ink-faint); margin-top:8px; grid-column:1; overflow-x:auto; white-space:nowrap; padding-bottom:2px}
+  .cap .flow b{color:var(--accent-deep)}
+  .callout{background:linear-gradient(180deg,var(--surface),var(--surface-2)); border:1px solid var(--line); border-left:3px solid var(--accent);
+    border-radius:12px; padding:22px; box-shadow:var(--shadow)}
+  .callout.gap{border-left-color:var(--sim)}
+  .gaplist{display:flex; flex-direction:column; gap:12px; margin:16px 0 0; padding:0; list-style:none}
+  .gaplist li{font-size:14px; color:var(--ink-dim); padding-left:26px; position:relative}
+  .gaplist li::before{content:"○"; position:absolute; left:2px; color:var(--sim); font-family:var(--mono)}
+  .gaplist li b{color:var(--ink); font-weight:600}
+  .gaplist li.done::before{content:"✓"; color:var(--accent-deep)}
+  .cmd{margin-top:16px; background:var(--surface); border:1px solid var(--line); border-radius:10px; overflow:hidden}
+  .cmd .l{padding:9px 15px; border-bottom:1px solid var(--line-soft); font-family:var(--mono); font-size:12.5px; color:var(--ink-dim); white-space:pre; overflow-x:auto}
+  .cmd .l:last-child{border-bottom:0}
+  .cmd .l b{color:var(--accent-deep)}
+  .cmd .l .c{color:var(--ink-faint)}
+  footer{padding:34px 0 54px; border-top:1px solid var(--line-soft); color:var(--ink-faint)}
+  .rules{display:flex; flex-direction:column; gap:9px; margin:0 0 22px; padding:0; list-style:none}
+  .rules li{font-size:13.5px; color:var(--ink-dim); padding-left:20px; position:relative}
+  .rules li::before{content:"§"; position:absolute; left:0; color:var(--accent-deep); font-family:var(--mono)}
+  .rules li b{color:var(--ink); font-weight:600}
+  .prov{font-family:var(--mono); font-size:11px; color:var(--ink-faint); letter-spacing:.04em; line-height:1.9}
+  @media (max-width:620px){
+    .entry{grid-template-columns:1fr; gap:10px}
+    .cap{grid-template-columns:1fr}
+    .cap .stamps{grid-column:1; grid-row:auto; flex-direction:row; flex-wrap:wrap}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="top">
+    <div class="brandrow">
+      <span class="wordmark">A<b>X</b>M</span>
+      <span class="kicker">Sovereign Evidence Ecosystem · operator's map</span>
+    </div>
+  </header>
+
+  <section class="hero">
+    <h1>The power is <em>proof no vendor can revoke.</em></h1>
+    <p class="lead">Six repositories, one discipline: capture a surface, bound the action, stamp the
+      evidence tier, seal it through genesis — and prove the record still holds after Palantir, the
+      browser, the camera, ScreenGhost, GhostBox, and every one of our own components is removed
+      from the loop.</p>
+
+    <div class="receipt" role="img" aria-label="A sealed interface trace verifying detached">
+      <div class="rhead"><span class="seal"></span> custody receipt — one sealed interface trace</div>
+      <div class="rbody">
+        <div><span class="k">shard</span><span class="h">sh1_a35b4cdc02b0f4c27b306399f03ac4db4f71efb5ddcf94e33ec05c2c476bbc0a</span></div>
+        <div><span class="k">tier</span><span class="h">interface_procedure_trace</span>  ·  rendered pixels + one bounded action + verification</div>
+        <div><span class="k">suite</span><span class="h">axm-hybrid1</span>  ·  ed25519 ‖ ml-dsa-44  (both must verify)</div>
+        <div><span class="k">verify</span><span class="ok">PASS</span>  —  detached: importer · browser · ghostbox · palantir  →  <span class="ok">absent</span></div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <p class="eyebrow">The one pattern, everywhere</p>
+    <h2>Every edge is the same seven moves</h2>
+    <p>Foundry export, screenshot, dashboard click, camera frame — each is just a <em>surface</em>.
+      What makes it evidence instead of automation is the chain that runs after it.</p>
+    <div class="spine" role="list" aria-label="The custody pattern, seven steps">
+      <div class="step" role="listitem"><div class="bar"></div><div class="dot"></div><div class="lab">surface</div><div class="sub">what the human saw / touched</div></div>
+      <div class="step" role="listitem"><div class="bar"></div><div class="dot"></div><div class="lab">bounded act</div><div class="sub">one approved move, or none</div></div>
+      <div class="step" role="listitem"><div class="bar"></div><div class="dot"></div><div class="lab">evidence tier</div><div class="sub">explicit &amp; limited</div></div>
+      <div class="step seal" role="listitem"><div class="bar"></div><div class="dot"></div><div class="lab">genesis seal</div><div class="sub">sh1_ · custody id</div></div>
+      <div class="step" role="listitem"><div class="bar"></div><div class="dot"></div><div class="lab">detached verify</div><div class="sub">no vendor in the loop</div></div>
+      <div class="step" role="listitem"><div class="bar"></div><div class="dot"></div><div class="lab">attention</div><div class="sub">bounded findings</div></div>
+      <div class="step" role="listitem"><div class="dot"></div><div class="lab">human review</div><div class="sub">you decide; never the machine</div></div>
+    </div>
+  </section>
+
+  <section>
+    <p class="eyebrow">What we have · on main, today</p>
+    <h2>Six repositories, one custody chain</h2>
+    <div class="ledger">
+
+      <div class="entry">
+        <div class="who"><span class="repo">axm-genesis</span><span class="role">the kernel</span></div>
+        <div>
+          <p class="what">The frozen trust root. Seals <b>axm-hybrid1</b> shards, derives the
+            <b>sh1_</b> custody id, and verifies with an out-of-band key. It owns all the
+            cryptography; every spoke borrows it and none re-implements it. At <b>v1.0.0</b>.</p>
+          <div class="tags"><span class="stamp frozen">frozen · v1.0.0</span><span class="stamp proven">substrate</span></div>
+        </div>
+      </div>
+
+      <div class="entry">
+        <div class="who"><span class="repo">axm-core</span><span class="role">exit &amp; knowledge</span></div>
+        <div>
+          <p class="what">The Palantir exit. Pulls a Foundry export off an S3-compatible surface,
+            checksums it, seals an <b>exit bundle</b>, and rebuilds a queryable ontology + lineage
+            graph — verified first, Palantir IDs kept as external refs, never as custody. The
+            simulated surface caught and fixed a real <b>silent-truncation</b> bug past 1000 objects.</p>
+          <div class="tags"><span class="stamp proven">pipeline proven</span><span class="stamp proven">graph loader</span><span class="stamp sim">surface simulated</span></div>
+        </div>
+      </div>
+
+      <div class="entry">
+        <div class="who"><span class="repo">ScreenGhost</span><span class="role">intake &amp; operation</span></div>
+        <div>
+          <p class="what">Turns what you saw and did into evidence. Screenshots sealed as
+            <b>pixel_capture</b> (opaque bytes, never OCR'd). Bounded <b>interface procedures</b>
+            on real Chromium: one approved click, verified visible result, sealed trace — and any
+            <b>drift</b> stops the run and is sealed as its own evidence.</p>
+          <div class="tags"><span class="stamp proven">pixel capture</span><span class="stamp proven">interface procedure</span><span class="stamp wire">vendor surface not wired</span></div>
+        </div>
+      </div>
+
+      <div class="entry">
+        <div class="who"><span class="repo">GhostBox</span><span class="role">attention &amp; review</span></div>
+        <div>
+          <p class="what">The level-2 layer that watches, but never owns. Verifies custody
+            <b>before</b> reading anything, emits bounded findings, and routes them to human review.
+            Structurally cannot restate a tier, assert page truth, or turn a review into a verdict —
+            the review vocabulary has no word for "true".</p>
+          <div class="tags"><span class="stamp proven">custody seam</span><span class="stamp proven">pixel observer</span><span class="stamp proven">human review</span></div>
+        </div>
+      </div>
+
+      <div class="entry">
+        <div class="who"><span class="repo">axm-embodied</span><span class="role">physical liability</span></div>
+        <div>
+          <p class="what">Proof of the physical world. The <b>Flash Freeze</b> recorder + Shadow
+            Runtime seal what a robot perceived and chose at a safety event. Event-triggered
+            <b>camera frames</b> sealed as <b>physical_capture</b> — opaque bytes, declared triggers,
+            visible gaps, an unbroken continuity chain. No filtering, no interpretation.</p>
+          <div class="tags"><span class="stamp proven">flight recorder</span><span class="stamp proven">frame capture</span><span class="stamp wire">camera intake not wired</span></div>
+        </div>
+      </div>
+
+      <div class="entry seatrow">
+        <div class="who"><span class="repo">axm-console</span><span class="role">the seat</span></div>
+        <div>
+          <p class="what">The cockpit. One command — <b>axm capture / operate / verify / queue /
+            review</b> — drives any surface's spoke to a sealed shard, verifies it <b>detached</b>,
+            hands you a plain-English receipt, and queues it for your decision. Owns no custody: the
+            core imports no spoke; each driver runs its spoke as a subprocess.
+            <b>All four surfaces driven.</b></p>
+          <div class="tags"><span class="stamp proven">console live</span><span class="stamp proven">4/4 surfaces driven</span><span class="stamp proven">CI drives a spoke</span></div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <section>
+    <p class="eyebrow">The vernacular · evidence tiers</p>
+    <h2>Every record says exactly what it is — and isn't</h2>
+    <p>A tier is a promise about the record's reach. Nothing here silently becomes more than it was
+      captured as; that discipline is what keeps this a custody system and not a surveillance one.</p>
+    <div class="tiers">
+      <div class="tier">pixel_capture <span>· rendered surface only</span></div>
+      <div class="tier">interface_procedure_trace <span>· one bounded action + verification</span></div>
+      <div class="tier">physical_capture <span>· sensor bytes in declared windows</span></div>
+      <div class="tier">sim-foundry-s3 <span>· simulation, labeled as such</span></div>
+      <div class="tier">synthesized_sample <span>· a placeholder, never a real capture</span></div>
+    </div>
+  </section>
+
+  <section>
+    <p class="eyebrow">What you can do · from the seat</p>
+    <h2>Four flows, one command each, all verifying detached</h2>
+    <div class="caps">
+      <div class="cap">
+        <h3>Walk out of Palantir with your data still provable</h3>
+        <div class="stamps"><span class="stamp proven">driven</span><span class="stamp sim">sim surface</span></div>
+        <p>Point at a Foundry export, seal the bundle, and rebuild the ontology + lineage graph that
+          verifies without Palantir ever being in the room.</p>
+        <div class="flow">axm capture foundry-export <b>→</b> checksum <b>→</b> seal <b>→</b> verify <b>→</b> graph</div>
+      </div>
+      <div class="cap">
+        <h3>Seal the screen you actually saw</h3>
+        <div class="stamps"><span class="stamp proven">driven</span></div>
+        <p>A screenshot becomes a tamper-evident pixel_capture record, watched by GhostBox and queued
+          for your review — the DOM, the clipboard, and the platform never get a vote.</p>
+        <div class="flow">axm capture screenshot <b>→</b> pixel_capture <b>→</b> observe <b>→</b> review</div>
+      </div>
+      <div class="cap">
+        <h3>Operate an app the vendor won't give you an API for</h3>
+        <div class="stamps"><span class="stamp proven">driven</span><span class="stamp wire">local fixture</span></div>
+        <p>One approved, bounded click on a real rendered surface; the visible result is verified and
+          the whole trace sealed. If the UI drifted, it stops and seals the drift instead.</p>
+        <div class="flow">axm operate interface-procedure <b>→</b> before <b>→</b> click <b>→</b> verify <b>→</b> trace</div>
+      </div>
+      <div class="cap">
+        <h3>Make a camera into a witness, not a feed</h3>
+        <div class="stamps"><span class="stamp proven">driven</span><span class="stamp wire">synthetic frames</span></div>
+        <p>Event-triggered frames, chained for continuity and sealed as physical_capture — capture
+          and custody only. The "who / what / when" stays a later, human-gated question.</p>
+        <div class="flow">axm capture camera-frames <b>→</b> window <b>→</b> chain <b>→</b> judge <b>→</b> seal</div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="callout">
+      <p class="eyebrow">The seat is built</p>
+      <h2>You have the power, and now a place to sit</h2>
+      <p>Every surface on the map runs from one command. The console owns no custody — sealing stays
+        in the spokes, verification is the kernel's, the review queue records human decisions and
+        makes none.</p>
+      <div class="cmd" aria-label="example console session">
+        <div class="l">$ <b>axm capture</b> camera-frames</div>
+        <div class="l">  <span class="c">tier</span>   physical_capture</div>
+        <div class="l">  <span class="c">shard</span>  sh1_79eb5e94…   <span class="c">verify</span> <b>PASS ✓</b>   detached: spoke · vendor · sensor · AI → absent</div>
+        <div class="l">  <span class="c">→</span> admitted to your review queue.   $ <b>axm review</b> … --as escalate</div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="callout gap">
+      <p class="eyebrow" style="color:var(--sim)">The honest edge · what's proven vs what's real</p>
+      <h2>Merged and internally honest — not yet deployed</h2>
+      <p>The bones are real and the discipline holds under probing. But a custody project owes itself
+        a truthful edge, so here is exactly where the line sits.</p>
+      <ul class="gaplist">
+        <li class="done"><b>Fixed:</b> the synthesized screenshot is now sealed as
+          <span class="mono">synthesized_sample</span>, never a fake real capture; the kernel-absent
+          receipt degrades instead of crashing; CI now drives a real spoke, so the cross-repo claim
+          is covered, not just proven off-CI.</li>
+        <li><b>Not deployed.</b> The crypto backend is the pure-Python <span class="mono">dilithium-py</span>
+          fallback — functional, not load-proven. Every surface is a simulation or a local fixture;
+          no real Foundry tenant, camera, or vendor dashboard has crossed the system.</li>
+        <li><b>Not packaged.</b> No <span class="mono">pip install axm-console</span> yet; it lives in
+          the repo, not on a PATH.</li>
+        <li><b>One contract unreconciled.</b> GhostBox's <span class="mono">PhysicalEvidenceEvent</span>
+          is still a mirror-side guess, never checked against a real embodied shard.</li>
+        <li><b>Deliberately absent.</b> No interpretation layer — no OCR, no vision models. Pixels
+          stay opaque until a human-gated, tiered annotation layer earns the right to read them.</li>
+      </ul>
+    </div>
+  </section>
+
+  <footer>
+    <p class="eyebrow">Standing rules · non-negotiable</p>
+    <ul class="rules">
+      <li><b>Simulate, don't wait.</b> Known surfaces are simulated at fidelity and labeled as such — no task ever stalls on live credentials.</li>
+      <li><b>No interpretation without a gate.</b> No OCR, no vision models; pixels stay opaque until a human-gated, tiered annotation layer earns the right to read them.</li>
+      <li><b>Every artifact declares its tier.</b> Nothing silently becomes platform truth, identity, or legal proof.</li>
+      <li><b>Custody is genesis's alone.</b> Spokes reference the sh1_ id; they never mint, copy, or override it.</li>
+    </ul>
+    <p class="prov">status: console live · all four surfaces driven · merged to main across
+      axm-core · ghostbox · screenghost · axm-embodied · axm-console<br>
+      verified against genesis v1.0.0 · every record proven detached · no live-data gates, by rule</p>
+  </footer>
+
+</div>
+<script>
+  // Honor a viewer theme toggle if one stamps data-theme; otherwise follow the OS.
+  (function(){ try{ var t = localStorage.getItem("axm-theme"); if(t) document.documentElement.setAttribute("data-theme", t); }catch(e){} })();
+</script>
+</body>
+</html>
