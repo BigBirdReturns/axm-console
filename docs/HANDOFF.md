@@ -78,8 +78,17 @@ soften that wall — a real downgrade here.
    a real Foundry tenant, a real camera, a real vendor dashboard. Changes the risk
    profile; not to be drifted into. Every surface driver already resolves its
    spoke + target from params/env, so this is config, not new code.
-5. **Cosmetic:** merged `claude/*` branches linger on several remotes (the git
-   proxy refuses deletes; clear them in the GitHub UI).
+5. **Cosmetic:** merged `claude/*` branches linger on several remotes.
+   *(Corrected 2026-07-06: the earlier "git proxy refuses deletes" claim was
+   never tested — the actual blocker is the session permission layer, which
+   requires the operator to explicitly authorize remote branch deletion. On
+   GhostBox, five branches are verified safe to delete via merged-PR state
+   (#2–#6): `screenghost-ghostbox-prs-vve6um`, `axm-sovereign-spine-v0`,
+   `axm-core-knowledge-edge`, `ghostbox-pixel-evidence-observer-v0`,
+   `ghostbox-pixel-review-v0`. `threat-geometry-paper-vdbnp0` is PR #1 — a
+   deliberate open reconcile-or-close decision, do NOT delete. Other repos:
+   run the same merged-PR check before deleting; branch-tip ancestry is
+   useless here because PRs are squash-merged.)*
 
 With 1–3 closed, **every GhostBox interop edge has now been reconciled against
 its real surface** (`docs/GENESIS_EDGE_MISMATCHES.md` in GhostBox tracks the
