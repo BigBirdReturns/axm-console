@@ -15,7 +15,14 @@ Two standing rules: **simulate, don't wait** (no task stalls on live credentials
 sims are labeled as sims) and **no interpretation without a gate** (no OCR, no
 vision models until a human-gated, tiered annotation layer earns it).
 
-## Repositories (verdict: 6 real, 1 phantom)
+## Repositories (verdict: 7 real, 0 phantom)
+
+*(Correction, 2026-07-06: the earlier "axm-chat is an empty phantom" verdict
+was stale — the repo was already fully built (spoke, distiller, CLI, tests,
+ingester, reconciled onto the v1 kernel per RFC 0007). What was actually
+phantom was the GhostBox **edge**: `ConversationShardRef` was a mirror-side
+guess never checked against a real axm-chat shard. That edge is now wired —
+see the punch list.)*
 
 | Repo | Role | Keep? |
 |---|---|---|
@@ -25,7 +32,7 @@ vision models until a human-gated, tiered annotation layer earns it).
 | `GhostBox` | attention & review (custody seam, observers, human review) | yes |
 | `axm-embodied` | physical liability (Flash Freeze recorder; frame capture → physical_capture) | yes |
 | `axm-console` | **the seat** — `axm capture/operate/verify/queue/review`, all 4 surfaces driven | yes |
-| `axm-chat` | named in contracts, **empty, never built** | **build it or delete it — phantom** |
+| `axm-chat` | conversation spoke (`import` → sealed `chat/conversation` shards); GhostBox edge wired | yes |
 
 Separate repos are a deliberate cost: they make the sovereignty boundary a *hard
 wall* (GhostBox can't import ScreenGhost as authority) instead of a lint rule.
@@ -46,24 +53,38 @@ soften that wall — a real downgrade here.
 
 ## What's LEFT (the punch list)
 
-1. **GhostBox ↔ embodied reconciliation** *(highest value — the last internal
-   dishonesty).* GhostBox's `PhysicalEvidenceEvent` / `EmbodiedSource` in
-   `GhostBox/src/ghostbox/interop/contracts.py` are **mirror-side guesses never
-   checked against a real embodied shard.** Plan: drive a real `axm-embodied`
-   frame-capture shard (or use `axm capture camera-frames`), run it against the
-   declared contract, correct the contract *to reality* (the pattern used every
-   time), and land a GhostBox physical-evidence observer — custody-verified first,
-   bounded findings, mirroring `pixel_observer.py` / `knowledge_observer.py`.
-2. **Package `axm-console`** — `pip install`, `axm` on PATH. Currently runs via
-   `python -m axm_console.cli`. Small, high-leverage.
-3. **`axm-chat`** — build the `ConversationShardRef` edge, or delete it from the
-   map + `contracts.py`. Don't leave it a phantom.
+*(Updated 2026-07-06 — session on `claude/session-planning-1h0xlw`.)*
+
+1. ~~**GhostBox ↔ embodied reconciliation**~~ **DONE.** A real
+   `FrameCaptureRecorder` session (sim frames, labeled as sim) was driven and
+   sealed via the real `compile_frame_capsule`, verified detached. Contract
+   corrected to reality (`fidelity` removed, `trigger_source` + `frame_id`
+   added, `EmbodiedSource` annotated as an adapter role);
+   `physical_observer.py` landed on the one custody pattern, live-proven
+   against the real probe shard. GhostBox suite 108/108.
+2. ~~**Package `axm-console`**~~ **was already done** — `pyproject.toml` has
+   carried `[project.scripts] axm = "axm_console.cli:main"` all along; the
+   entry point was verified working this session (invoked exactly as pip wires
+   it, plus the full suite 17/17 with the kernel + playwright present). The
+   earlier "runs via `python -m` only" note was stale.
+3. ~~**`axm-chat`**~~ **DONE** (the repo was never the phantom — the edge was).
+   A real `axm-chat import` was probed; `ConversationShardRef` now composes
+   over `SealedShard` (same reconciliation as the axm-core edge), and
+   `conversation_observer.py` landed on the one custody pattern, live-proven
+   against the real probe shard. One reality correction: axm-chat exports NO
+   shard-reference API, so `ConversationSpoke` is documented as a
+   consumer-side adapter role.
 4. **(Your call, retires a standing rule) point one surface at something real** —
    a real Foundry tenant, a real camera, a real vendor dashboard. Changes the risk
    profile; not to be drifted into. Every surface driver already resolves its
    spoke + target from params/env, so this is config, not new code.
 5. **Cosmetic:** merged `claude/*` branches linger on several remotes (the git
    proxy refuses deletes; clear them in the GitHub UI).
+
+With 1–3 closed, **every GhostBox interop edge has now been reconciled against
+its real surface** (`docs/GENESIS_EDGE_MISMATCHES.md` in GhostBox tracks the
+full status). The remaining items are a deliberate risk decision (4) and UI
+housekeeping (5).
 
 ## How to run things
 
