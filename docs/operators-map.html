@@ -341,10 +341,15 @@
         <li><b>Not deployed.</b> The crypto backend is the pure-Python <span class="mono">dilithium-py</span>
           fallback — functional, not load-proven. Every surface is a simulation or a local fixture;
           no real Foundry tenant, camera, or vendor dashboard has crossed the system.</li>
-        <li><b>Not packaged.</b> No <span class="mono">pip install axm-console</span> yet; it lives in
-          the repo, not on a PATH.</li>
-        <li><b>One contract unreconciled.</b> GhostBox's <span class="mono">PhysicalEvidenceEvent</span>
-          is still a mirror-side guess, never checked against a real embodied shard.</li>
+        <li class="done"><b>Packaged.</b> <span class="mono">pyproject.toml</span> ships the
+          <span class="mono">axm</span> entry point; <span class="mono">axm_console.cli:main</span> runs
+          as pip would wire it (verified 2026-07-06 — the pip-install-to-PATH step itself was not
+          exercised in that sandbox). Not published to PyPI — install from the repo.</li>
+        <li class="done"><b>Every contract edge reconciled.</b> GhostBox's
+          <span class="mono">ConversationShardRef</span> (axm-chat) and
+          <span class="mono">PhysicalEvidenceEvent</span> (axm-embodied) were probed against real
+          spoke output, corrected to reality, and landed with custody-first observers — live-proven
+          against the probe artifacts 2026-07-06; the suite (108/108) pins the replicas.</li>
         <li><b>Deliberately absent.</b> No interpretation layer — no OCR, no vision models. Pixels
           stay opaque until a human-gated, tiered annotation layer earns the right to read them.</li>
       </ul>

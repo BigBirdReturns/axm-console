@@ -92,6 +92,16 @@ housekeeping (5).
 # genesis kernel must be installed (v1.0.0 @ 9074e7f):
 pip install 'git+https://github.com/BigBirdReturns/axm-genesis.git@9074e7fb2e9cedde692b248cdd0c6a805e77d8ac#egg=axm-genesis[mldsa-compat]'
 
+# no-install fallback (sandboxes where pip-from-git is blocked): check out
+# axm-genesis at the SAME pinned commit and run it from source —
+#   pip install blake3 pynacl click 'dilithium-py>=0.5.0'   # PyPI deps only
+#   export PYTHONPATH=/path/to/axm-genesis/src
+# plus thin axm-build / axm-verify wrappers on PATH, each one line of shell:
+#   exec python3 -c "from axm_build.cli import main; main()" "$@"     # axm-build
+#   exec python3 -c "from axm_verify.cli import main; main()" "$@"    # axm-verify
+# (wrappers must export the PYTHONPATH above; the whole 108-test GhostBox
+#  suite and the 17-test console suite run this way — verified 2026-07-06)
+
 # console: core tests need only the kernel; driver tests need the spokes checked out
 cd axm-console && python -m pytest tests/ -q      # 10 core pass; 5 driver tests skip w/o spokes
 AXM_EMBODIED_REPO=/path/to/axm-embodied \
