@@ -94,15 +94,16 @@ soften that wall — a real downgrade here.
    run the same merged-PR check before deleting; branch-tip ancestry is
    useless here because PRs are squash-merged.)*
 
-6. **OPEN — axm-aide v0 adversarial review.** The personal-assistant spoke
-   landed and pushed (`axm-aide` @ `342b54b`, suite 28/28, driver-validated
-   end to end) but its adversarial review was killed mid-run by a session
-   limit. Per `CONTINUITY.md`, the review debt is real: next session, run the
-   refutation pass (doctrine bypasses — can the aide be made to decide, who
-   can seal a disposition claim; custody — does brief verify before mount;
-   correctness — status-shard created_at collisions, proposal one-line-fold
-   collisions; test quality; durability/overclaims) and land what survives
-   as a follow-up commit.
+6. ~~**axm-aide v0 adversarial review**~~ **CLOSED** (`axm-aide` @ `6ea94b1`).
+   The refutation pass ran after the limit reset: doctrine and custody held
+   under attack (proposal smuggling, self-disposition, tag inference, and
+   pre-verify reads all structurally refuted). Two real correctness findings
+   fixed and pinned by regression tests — same-second status resolution was
+   decided by shard-name (i.e. status-word) sort order, now broken by a
+   per-task `status_seq` claim in both resolution paths; and colliding
+   caller content now refuses cleanly instead of surfacing a kernel
+   traceback. Brief refuses loudly over a fully-unverifiable store; the v0
+   one-key-pool trust limit is stated in LOOP.md. Suite 31/31.
 
 With 1–3 closed, **every GhostBox interop edge has now been reconciled against
 its real surface** (`docs/GENESIS_EDGE_MISMATCHES.md` in GhostBox tracks the
