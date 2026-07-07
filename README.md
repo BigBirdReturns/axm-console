@@ -91,7 +91,7 @@ than faking a run — no Potemkin capture.
 
 ## Map
 
-[`docs/operators-map.html`](docs/operators-map.html) is a single-page, self-
+[`index.html`](index.html) is a single-page, self-
 contained map of the whole ecosystem — every repository, the shared pattern, the
 tier vocabulary, the four flows, and (honestly) where "proven" stops and "not yet
 deployed" begins. Open it directly or serve it via Pages.
