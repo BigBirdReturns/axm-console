@@ -23,11 +23,19 @@ pytestmark = pytest.mark.skipif(not kernel_available(), reason="axm-genesis kern
 
 
 def _core_repo() -> str | None:
+    # axm-core provides Spectra (the query engine that `ask` mounts into).
     repo = Path(os.environ.get("AXM_CORE_REPO", "/workspace/axm-core"))
     return str(repo) if (repo / "spectra" / "axiom_runtime" / "engine.py").exists() else None
 
 
-CORE = _core_repo()
+def _ghostbox_repo() -> str | None:
+    # GhostBox provides the foundry_exit engine that seals the ontology shard.
+    repo = Path(os.environ.get("GHOSTBOX_REPO", "/workspace/GhostBox"))
+    return str(repo) if (repo / "foundry_exit" / "ontology_api.py").exists() else None
+
+
+CORE = _core_repo()          # Spectra, for the query half
+GHOSTBOX = _ghostbox_repo()  # foundry_exit, for the seal half
 
 try:  # Spectra's query engine dependency
     import duckdb  # noqa: F401
@@ -37,7 +45,8 @@ except Exception:  # pragma: no cover
     _HAVE_DUCKDB = False
 
 requires_duckdb = pytest.mark.skipif(not _HAVE_DUCKDB, reason="duckdb not installed")
-requires_core = pytest.mark.skipif(not CORE, reason="axm-core spoke not present")
+requires_core = pytest.mark.skipif(not (CORE and GHOSTBOX),
+                                   reason="need axm-core (Spectra) + GhostBox (foundry_exit)")
 
 OBJECT_TYPE_LABELS_SQL = """
     SELECT DISTINCT e.label
@@ -49,10 +58,11 @@ OBJECT_TYPE_LABELS_SQL = """
 
 @pytest.fixture(scope="module")
 def sealed(tmp_path_factory):
-    if not CORE:
-        pytest.skip("axm-core spoke not present")
+    if not (CORE and GHOSTBOX):
+        pytest.skip("need axm-core (Spectra) + GhostBox (foundry_exit)")
     home = tmp_path_factory.mktemp("ask-home")
-    receipt, shard = Console(home).run_surface("ontology-exit", params={"spoke_repo": CORE})
+    # seal via GhostBox's foundry_exit; query via axm-core's Spectra
+    receipt, shard = Console(home).run_surface("ontology-exit", params={"spoke_repo": GHOSTBOX})
     key = Path(shard).parent / "keys" / "publisher.pub"
     return receipt, Path(shard), key
 

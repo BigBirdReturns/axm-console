@@ -27,8 +27,8 @@ def _spoke(env_var: str, default: str, marker: str) -> str | None:
 
 CAMERA = _spoke("AXM_EMBODIED_REPO", "/workspace/axm-embodied", "src/axm_embodied/frame_capture.py")
 SG = _spoke("AXM_SCREENGHOST_REPO", "/workspace/screenghost", "core/pixel_seal.py")
-CORE = _spoke("AXM_CORE_REPO", "/workspace/axm-core", "foundry_exit/sim_surface.py")
-ONTOLOGY = _spoke("AXM_CORE_REPO", "/workspace/axm-core", "foundry_exit/ontology_api.py")
+CORE = _spoke("GHOSTBOX_REPO", "/workspace/GhostBox", "foundry_exit/sim_surface.py")
+ONTOLOGY = _spoke("GHOSTBOX_REPO", "/workspace/GhostBox", "foundry_exit/ontology_api.py")
 
 
 def _drive(tmp_path, name, params):
