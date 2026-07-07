@@ -145,7 +145,7 @@ exists precisely so step 2 survives broken package ecosystems.
 - GhostBox `docs/GENESIS_EDGE_MISMATCHES.md` — contract-edge status ledger.
 - axm-genesis ledger — kernel version/succession policy; the only authority
   on crypto.
-- `operators-map.html` (here) — the one-page visual; hand-maintained, so
+- `index.html` (repo root) — the one-page visual / Pages front page; hand-maintained, so
   audit it after every substantive change.
 - Each repo's README + spec docs — per-component truth; the consistency
   audits keep them honest.
