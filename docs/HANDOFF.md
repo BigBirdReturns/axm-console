@@ -29,9 +29,9 @@ see the punch list.)*
 | Repo | Role | Keep? |
 |---|---|---|
 | `axm-genesis` | frozen crypto kernel; seals `axm-hybrid1` shards, derives `sh1_`, verifies. **v1.0.0** @ `9074e7f` | **yes — the trust root** |
-| `axm-core` | Palantir/Foundry exit + knowledge (sim S3 surface, exit bundle, graph loader) | yes |
+| `axm-core` | Spectra query engine (backs `axm ask`) + knowledge | yes |
 | `ScreenGhost` | intake & operation (pixel_capture; interface procedures on real Chromium) | yes |
-| `GhostBox` | attention & review (custody seam, observers, human review) | yes |
+| `GhostBox` | attention & review (custody seam, observers, human review) **+ the Palantir/Foundry exit engine** (sim S3, exit bundle, ontology exit) | yes |
 | `axm-embodied` | physical liability (Flash Freeze recorder; frame capture → physical_capture) | yes |
 | `axm-console` | **the seat** — `axm capture/operate/verify/queue/review/ask`, all 5 surfaces driven | yes |
 | `axm-chat` | conversation spoke (`import` → sealed `chat/conversation` shards); GhostBox edge wired | yes |
@@ -131,7 +131,8 @@ pip install 'git+https://github.com/BigBirdReturns/axm-genesis.git@9074e7fb2e9ce
 cd axm-console && python -m pytest tests/ -q      # 12 core pass; 8 driver/ask tests skip w/o spokes
 AXM_EMBODIED_REPO=/path/to/axm-embodied \
 AXM_SCREENGHOST_REPO=/path/to/screenghost \
-AXM_CORE_REPO=/path/to/axm-core python -m pytest tests/ -q   # all 20
+GHOSTBOX_REPO=/path/to/GhostBox \
+  AXM_CORE_REPO=/path/to/axm-core python -m pytest tests/ -q   # all surfaces
 
 # drive a surface end to end:
 axm surfaces

@@ -14,7 +14,7 @@ adapter contract exists but the spoke drive is not wired.
 
 Spoke locations resolve from the environment (with deployment-shaped defaults)
 so the same drivers work wherever an operator has the spokes checked out:
-    AXM_EMBODIED_REPO   AXM_SCREENGHOST_REPO   AXM_CORE_REPO
+    AXM_EMBODIED_REPO   AXM_SCREENGHOST_REPO   GHOSTBOX_REPO
 A per-run ``spoke_repo`` param overrides the default for that run.
 """
 from __future__ import annotations
@@ -220,9 +220,9 @@ def _drive_interface_procedure(run: SurfaceRun) -> Tuple[Path, Path]:
 # ---------------------------------------------------------------------------
 
 def _drive_foundry_export(run: SurfaceRun) -> Tuple[Path, Path]:
-    repo = _resolve_repo(run, "AXM_CORE_REPO", "/workspace/axm-core")
+    repo = _resolve_repo(run, "GHOSTBOX_REPO", "/workspace/GhostBox")
     if not (repo / "foundry_exit" / "sim_surface.py").exists():
-        raise FileNotFoundError(f"axm-core spoke not found at {repo} (set AXM_CORE_REPO).")
+        raise FileNotFoundError(f"GhostBox spoke (foundry_exit) not found at {repo} (set GHOSTBOX_REPO).")
     out = run.workdir
     out.mkdir(parents=True, exist_ok=True)
     p = run.params
@@ -251,7 +251,7 @@ def _drive_foundry_export(run: SurfaceRun) -> Tuple[Path, Path]:
         sealed = seal_exit_bundle(manifest, bundle, out / "shard")
         print(json.dumps({{"shard": sealed.shard_dir, "pub": sealed.trusted_key_path}}))
     """
-    return _run_in_spoke(repo, script, f"axm-core foundry_exit not importable from {repo}")
+    return _run_in_spoke(repo, script, f"GhostBox foundry_exit not importable from {repo}")
 
 
 # ---------------------------------------------------------------------------
@@ -259,9 +259,9 @@ def _drive_foundry_export(run: SurfaceRun) -> Tuple[Path, Path]:
 # ---------------------------------------------------------------------------
 
 def _drive_ontology_exit(run: SurfaceRun) -> Tuple[Path, Path]:
-    repo = _resolve_repo(run, "AXM_CORE_REPO", "/workspace/axm-core")
+    repo = _resolve_repo(run, "GHOSTBOX_REPO", "/workspace/GhostBox")
     if not (repo / "foundry_exit" / "ontology_api.py").exists():
-        raise FileNotFoundError(f"axm-core spoke not found at {repo} (set AXM_CORE_REPO).")
+        raise FileNotFoundError(f"GhostBox spoke (foundry_exit) not found at {repo} (set GHOSTBOX_REPO).")
     out = run.workdir
     out.mkdir(parents=True, exist_ok=True)
     p = run.params
@@ -286,7 +286,7 @@ def _drive_ontology_exit(run: SurfaceRun) -> Tuple[Path, Path]:
         sealed = seal_ontology_capture(capture, shard)
         print(json.dumps({{"shard": sealed.shard_dir, "pub": sealed.trusted_key_path}}))
     """
-    return _run_in_spoke(repo, script, f"axm-core foundry_exit ontology_api not importable from {repo}")
+    return _run_in_spoke(repo, script, f"GhostBox foundry_exit ontology_api not importable from {repo}")
 
 
 # ---------------------------------------------------------------------------

@@ -60,14 +60,14 @@ AXM CUSTODY RECEIPT
 | `camera-frames` | capture | `physical_capture` | axm-embodied | **driven** |
 | `screenshot` | capture | `pixel_capture` | ScreenGhost | **driven** |
 | `interface-procedure` | operate | `interface_procedure_trace` | ScreenGhost | **driven** |
-| `foundry-export` | capture | `sim-foundry-s3` | axm-core | **driven** |
-| `ontology-exit` | capture | `foundry-ontology-wire-shape-reconciled` | axm-core | **driven** |
+| `foundry-export` | capture | `sim-foundry-s3` | GhostBox | **driven** |
+| `ontology-exit` | capture | `foundry-ontology-wire-shape-reconciled` | GhostBox | **driven** |
 
 All five surfaces are **driven** — the console runs each spoke end to end and
 verifies the sealed result here. A driver runs the spoke's own proven entry point
 in the spoke's repo context (a subprocess), so the console core never imports a
 spoke; the coupling is confined to the driver. Spoke locations resolve from
-`AXM_EMBODIED_REPO` / `AXM_SCREENGHOST_REPO` / `AXM_CORE_REPO` (with deployment
+`AXM_EMBODIED_REPO` / `AXM_SCREENGHOST_REPO` / `GHOSTBOX_REPO` (foundry surfaces) / `AXM_CORE_REPO` (Spectra `ask`) (with deployment
 defaults), or a per-run `spoke_repo` param.
 
 The refusal contract still stands: any future **declared** surface raises rather
