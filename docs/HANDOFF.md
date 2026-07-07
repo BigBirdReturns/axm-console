@@ -107,8 +107,9 @@ soften that wall — a real downgrade here.
 
 With 1–3 closed, **every GhostBox interop edge has now been reconciled against
 its real surface** (`docs/GENESIS_EDGE_MISMATCHES.md` in GhostBox tracks the
-full status). The remaining items are a deliberate risk decision (4), UI
-housekeeping (5), and one open review debt (6).
+full status). The remaining items are a deliberate risk decision (4) and UI
+housekeeping (5); item 6 (axm-aide review debt) is closed, and axm-aide now
+carries its own pinned-kernel CI (Actions enabled).
 
 ## How to run things
 
