@@ -94,10 +94,20 @@ soften that wall — a real downgrade here.
    run the same merged-PR check before deleting; branch-tip ancestry is
    useless here because PRs are squash-merged.)*
 
+6. **OPEN — axm-aide v0 adversarial review.** The personal-assistant spoke
+   landed and pushed (`axm-aide` @ `342b54b`, suite 28/28, driver-validated
+   end to end) but its adversarial review was killed mid-run by a session
+   limit. Per `CONTINUITY.md`, the review debt is real: next session, run the
+   refutation pass (doctrine bypasses — can the aide be made to decide, who
+   can seal a disposition claim; custody — does brief verify before mount;
+   correctness — status-shard created_at collisions, proposal one-line-fold
+   collisions; test quality; durability/overclaims) and land what survives
+   as a follow-up commit.
+
 With 1–3 closed, **every GhostBox interop edge has now been reconciled against
 its real surface** (`docs/GENESIS_EDGE_MISMATCHES.md` in GhostBox tracks the
-full status). The remaining items are a deliberate risk decision (4) and UI
-housekeeping (5).
+full status). The remaining items are a deliberate risk decision (4), UI
+housekeeping (5), and one open review debt (6).
 
 ## How to run things
 
