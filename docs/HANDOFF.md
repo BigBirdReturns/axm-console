@@ -2,7 +2,9 @@
 
 A cold-start brief for a fresh session. Everything below is on `main` across the
 repos unless marked otherwise. The one-page visual is
-[`operators-map.html`](operators-map.html).
+[`operators-map.html`](operators-map.html). **If you are new to this project —
+any model, any decade — read [`CONTINUITY.md`](CONTINUITY.md) first:** it
+separates what must never change from what you are free to change, and how.
 
 ## The thesis (don't lose this)
 
