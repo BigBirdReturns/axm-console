@@ -156,7 +156,7 @@
 
   <section class="hero">
     <h1>The power is <em>proof no vendor can revoke.</em></h1>
-    <p class="lead">Six repositories, one discipline: capture a surface, bound the action, stamp the
+    <p class="lead">Seven repositories, one discipline: capture a surface, bound the action, stamp the
       evidence tier, seal it through genesis — and prove the record still holds after Palantir, the
       browser, the camera, ScreenGhost, GhostBox, and every one of our own components is removed
       from the loop.</p>
@@ -190,7 +190,7 @@
 
   <section>
     <p class="eyebrow">What we have · on main, today</p>
-    <h2>Six repositories, one custody chain</h2>
+    <h2>Seven repositories, one custody chain</h2>
     <div class="ledger">
 
       <div class="entry">
@@ -251,11 +251,22 @@
         <div class="who"><span class="repo">axm-console</span><span class="role">the seat</span></div>
         <div>
           <p class="what">The cockpit. One command — <b>axm capture / operate / verify / queue /
-            review</b> — drives any surface's spoke to a sealed shard, verifies it <b>detached</b>,
+            review / ask</b> — drives any surface's spoke to a sealed shard, verifies it <b>detached</b>,
             hands you a plain-English receipt, and queues it for your decision. Owns no custody: the
             core imports no spoke; each driver runs its spoke as a subprocess.
-            <b>All four surfaces driven.</b></p>
-          <div class="tags"><span class="stamp proven">console live</span><span class="stamp proven">4/4 surfaces driven</span><span class="stamp proven">CI drives a spoke</span></div>
+            <b>All five surfaces driven.</b></p>
+          <div class="tags"><span class="stamp proven">console live</span><span class="stamp proven">5/5 surfaces driven</span><span class="stamp proven">CI drives a spoke</span></div>
+        </div>
+      </div>
+
+      <div class="entry">
+        <div class="who"><span class="repo">axm-chat</span><span class="role">conversation spoke</span></div>
+        <div>
+          <p class="what"><b>import</b> turns Claude/ChatGPT exports into sealed
+            <b>chat/conversation</b> shards. GhostBox's edge is wired — the
+            <b>ConversationShardRef</b> composes over <b>SealedShard</b>, live-proven
+            against a real probe shard.</p>
+          <div class="tags"><span class="stamp proven">import</span><span class="stamp proven">GhostBox edge wired</span></div>
         </div>
       </div>
 
@@ -272,13 +283,14 @@
       <div class="tier">interface_procedure_trace <span>· one bounded action + verification</span></div>
       <div class="tier">physical_capture <span>· sensor bytes in declared windows</span></div>
       <div class="tier">sim-foundry-s3 <span>· simulation, labeled as such</span></div>
+      <div class="tier">foundry-ontology-wire-shape-reconciled <span>· Ontology API v2, wire-shape reconciled — not live-tenant proven</span></div>
       <div class="tier">synthesized_sample <span>· a placeholder, never a real capture</span></div>
     </div>
   </section>
 
   <section>
     <p class="eyebrow">What you can do · from the seat</p>
-    <h2>Four flows, one command each, all verifying detached</h2>
+    <h2>Five flows, one command each, all verifying detached</h2>
     <div class="caps">
       <div class="cap">
         <h3>Walk out of Palantir with your data still provable</h3>
@@ -307,6 +319,13 @@
         <p>Event-triggered frames, chained for continuity and sealed as physical_capture — capture
           and custody only. The "who / what / when" stays a later, human-gated question.</p>
         <div class="flow">axm capture camera-frames <b>→</b> window <b>→</b> chain <b>→</b> judge <b>→</b> seal</div>
+      </div>
+      <div class="cap">
+        <h3>Take your ontology out of Palantir — then ask it questions</h3>
+        <div class="stamps"><span class="stamp proven">driven</span><span class="stamp wire">wire-shape reconciled</span></div>
+        <p>Pull the Foundry Ontology API v2's wire shapes into a sealed record, then query any
+          sealed shard — SQL or plain English — verify-gated through Spectra.</p>
+        <div class="flow">axm capture ontology-exit <b>→</b> seal <b>→</b> verify detached <b>→</b> axm ask</div>
       </div>
     </div>
   </section>
@@ -364,8 +383,8 @@
       <li><b>Every artifact declares its tier.</b> Nothing silently becomes platform truth, identity, or legal proof.</li>
       <li><b>Custody is genesis's alone.</b> Spokes reference the sh1_ id; they never mint, copy, or override it.</li>
     </ul>
-    <p class="prov">status: console live · all four surfaces driven · merged to main across
-      axm-core · ghostbox · screenghost · axm-embodied · axm-console<br>
+    <p class="prov">status: console live · all five surfaces driven · merged to main across
+      axm-core · ghostbox · screenghost · axm-embodied · axm-console · axm-chat<br>
       verified against genesis v1.0.0 · every record proven detached · no live-data gates, by rule</p>
   </footer>
 

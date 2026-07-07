@@ -27,6 +27,7 @@ axm capture camera-frames           # drive a surface → sealed, verified recor
 axm verify <shard_dir> --key <pub>  # verify ANY sealed shard, from any spoke
 axm queue                           # your review queue
 axm review <shard_id> --by you --as escalate --note "look at this"
+axm ask <shard_dir> --key <pub> "what links to Aircraft"   # verify-gated query, SQL or NL
 ```
 
 A real run, this environment:
@@ -60,8 +61,9 @@ AXM CUSTODY RECEIPT
 | `screenshot` | capture | `pixel_capture` | ScreenGhost | **driven** |
 | `interface-procedure` | operate | `interface_procedure_trace` | ScreenGhost | **driven** |
 | `foundry-export` | capture | `sim-foundry-s3` | axm-core | **driven** |
+| `ontology-exit` | capture | `foundry-ontology-wire-shape-reconciled` | axm-core | **driven** |
 
-All four surfaces are **driven** — the console runs each spoke end to end and
+All five surfaces are **driven** — the console runs each spoke end to end and
 verifies the sealed result here. A driver runs the spoke's own proven entry point
 in the spoke's repo context (a subprocess), so the console core never imports a
 spoke; the coupling is confined to the driver. Spoke locations resolve from
@@ -97,12 +99,14 @@ deployed" begins. Open it directly or serve it via Pages.
 ## Status
 
 v0. Core (verify-detached → receipt → queue) proven against genesis **v1.0.0**;
-**all four surfaces driven end to end** — camera-frames, screenshot,
-interface-procedure (real Chromium), and foundry-export (simulated S3). The
-spoke-independent core suite runs everywhere; **CI now also checks out a spoke and
-drives `camera-frames` for real**, so the cross-repo claim is covered, not just
-proven off-CI. The remaining driver integration tests run wherever their spokes
-are checked out and skip cleanly otherwise.
+**all five surfaces driven end to end** — camera-frames, screenshot,
+interface-procedure (real Chromium), foundry-export (simulated S3), and
+ontology-exit (Foundry Ontology API v2 wire shapes). The spoke-independent core
+suite runs everywhere; **CI now also checks out a spoke and drives
+`camera-frames` for real**, so the cross-repo claim is covered, not just proven
+off-CI. The remaining driver integration tests run wherever their spokes are
+checked out and skip cleanly otherwise. `axm ask` is the seat's first READ verb
+— verify-gated SQL/NL querying of any sealed shard through Spectra.
 
 Honesty fixes on this pass: a no-argument `screenshot` seals a labeled
 `synthesized_sample`, never a fake `manual_screenshot`; a kernel-absent receipt
