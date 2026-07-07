@@ -50,6 +50,9 @@ class Receipt:
     title: Optional[str]
     sealed_at: Optional[str]
     detached_absent: List[str] = field(default_factory=lambda: list(_ABSENT))
+    # Where the out-of-band trust anchor used for THIS verification lives —
+    # operator convenience only (e.g. the `axm ask` hint), never custody.
+    trusted_key_path: Optional[str] = None
 
     @property
     def verified(self) -> bool:
@@ -173,4 +176,5 @@ def build_receipt(shard_dir: str | Path, trusted_key: Optional[str | Path]) -> R
         suite=manifest.get("suite"),
         title=(manifest.get("metadata") or {}).get("title") or manifest.get("title"),
         sealed_at=(manifest.get("metadata") or {}).get("created_at"),
+        trusted_key_path=str(trusted_key) if trusted_key else None,
     )

@@ -28,6 +28,7 @@ def _spoke(env_var: str, default: str, marker: str) -> str | None:
 CAMERA = _spoke("AXM_EMBODIED_REPO", "/workspace/axm-embodied", "src/axm_embodied/frame_capture.py")
 SG = _spoke("AXM_SCREENGHOST_REPO", "/workspace/screenghost", "core/pixel_seal.py")
 CORE = _spoke("AXM_CORE_REPO", "/workspace/axm-core", "foundry_exit/sim_surface.py")
+ONTOLOGY = _spoke("AXM_CORE_REPO", "/workspace/axm-core", "foundry_exit/ontology_api.py")
 
 
 def _drive(tmp_path, name, params):
@@ -78,6 +79,16 @@ def test_foundry_export_driven(tmp_path):
     r = _drive(tmp_path, "foundry-export", {"spoke_repo": CORE, "objects": "80"})
     assert r.verified and r.shard_id.startswith("sh1_")
     assert r.evidence_tier is None  # honestly unstated by the sealed bundle
+
+
+@pytest.mark.skipif(not ONTOLOGY, reason="axm-core ontology-exit spoke not present")
+def test_ontology_exit_driven(tmp_path):
+    # The bundled fixture (an invented sample in the documented Ontology API v2
+    # wire shape, not a live tenant capture) is sealed and admitted to the
+    # queue like any other DRIVEN surface; the receipt still verifies detached.
+    r = _drive(tmp_path, "ontology-exit", {"spoke_repo": ONTOLOGY})
+    assert r.verified and r.shard_id.startswith("sh1_")
+    assert r.title == "Foundry ontology exit shard"
 
 
 @pytest.mark.skipif(not (CAMERA and SG and CORE), reason="not all spokes present")

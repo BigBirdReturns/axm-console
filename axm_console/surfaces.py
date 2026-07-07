@@ -73,8 +73,10 @@ def _run_in_spoke(cwd: Path, script: str, missing_hint: str) -> Tuple[Path, Path
     """Run a spoke script in its repo context; return (shard_dir, pub_key).
 
     The script must print a final JSON line: {"shard": <dir>, "pub": <pubkey>}.
-    Spoke coupling is confined to this subprocess; the console core never
-    imports a spoke.
+    Any earlier stdout lines are forwarded verbatim to the operator (e.g. an
+    honesty note that a default/synthesized input was used) before the JSON
+    line is parsed. Spoke coupling is confined to this subprocess; the console
+    core never imports a spoke.
     """
     proc = subprocess.run([sys.executable, "-c", textwrap.dedent(script)],
                           capture_output=True, text=True, cwd=str(cwd))
@@ -82,7 +84,10 @@ def _run_in_spoke(cwd: Path, script: str, missing_hint: str) -> Tuple[Path, Path
         if "ModuleNotFoundError" in proc.stderr or "No such file" in proc.stderr:
             raise FileNotFoundError(f"{missing_hint}\n{proc.stderr.strip()[-400:]}")
         raise RuntimeError(f"spoke run failed:\n{proc.stderr.strip()[-800:]}")
-    result = json.loads(proc.stdout.strip().splitlines()[-1])
+    lines = proc.stdout.strip().splitlines()
+    for line in lines[:-1]:
+        print(line)
+    result = json.loads(lines[-1])
     return Path(result["shard"]), Path(result["pub"])
 
 
@@ -250,6 +255,41 @@ def _drive_foundry_export(run: SurfaceRun) -> Tuple[Path, Path]:
 
 
 # ---------------------------------------------------------------------------
+# ontology-exit  (axm-core — Foundry Ontology API v2 capture, fully offline)
+# ---------------------------------------------------------------------------
+
+def _drive_ontology_exit(run: SurfaceRun) -> Tuple[Path, Path]:
+    repo = _resolve_repo(run, "AXM_CORE_REPO", "/workspace/axm-core")
+    if not (repo / "foundry_exit" / "ontology_api.py").exists():
+        raise FileNotFoundError(f"axm-core spoke not found at {repo} (set AXM_CORE_REPO).")
+    out = run.workdir
+    out.mkdir(parents=True, exist_ok=True)
+    p = run.params
+    capture = p.get("capture")
+    script = f"""
+        import json
+        from pathlib import Path
+        from foundry_exit.ontology_api import load_ontology_capture
+        from foundry_exit.ontology_seal import seal_ontology_capture
+        out = Path({str(out)!r})
+        repo = Path({str(repo)!r})
+        capture_arg = {capture!r}
+        if capture_arg:
+            capture_dir = Path(capture_arg)
+        else:
+            capture_dir = repo / "samples" / "foundry_ontology_fixture"
+            print("note: no capture= param given; sealing the repo's bundled sample "
+                  "(samples/foundry_ontology_fixture) -- an INVENTED sample in the "
+                  "documented Ontology API v2 wire shape, NOT a live tenant capture.")
+        capture = load_ontology_capture(capture_dir)
+        shard = out / "shard"
+        sealed = seal_ontology_capture(capture, shard)
+        print(json.dumps({{"shard": sealed.shard_dir, "pub": sealed.trusted_key_path}}))
+    """
+    return _run_in_spoke(repo, script, f"axm-core foundry_exit ontology_api not importable from {repo}")
+
+
+# ---------------------------------------------------------------------------
 # registry
 # ---------------------------------------------------------------------------
 
@@ -293,4 +333,10 @@ register(Surface(
     tier="sim-foundry-s3", status=Status.DRIVEN,
     summary="A Foundry S3 export (simulated surface) pulled, checksummed, and sealed as an exit bundle.",
     driver=_drive_foundry_export,
+))
+register(Surface(
+    name="ontology-exit", verb="capture", owner_repo="axm-core",
+    tier="foundry-ontology-wire-shape-reconciled", status=Status.DRIVEN,
+    summary="A Foundry Ontology API v2 capture (objectTypes/linkTypes/objects JSON) sealed as a queryable exit shard.",
+    driver=_drive_ontology_exit,
 ))

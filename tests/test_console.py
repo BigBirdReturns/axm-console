@@ -150,7 +150,8 @@ def test_queue_is_append_only(tmp_path):
 
 def test_surface_registry_is_all_driven():
     names = {s.name for s in all_surfaces()}
-    assert {"camera-frames", "screenshot", "interface-procedure", "foundry-export"} <= names
+    assert {"camera-frames", "screenshot", "interface-procedure", "foundry-export",
+            "ontology-exit"} <= names
     assert all(get(n).status is Status.DRIVEN for n in names)  # every surface now driven
 
 
