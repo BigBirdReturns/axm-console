@@ -290,6 +290,47 @@ def _drive_ontology_exit(run: SurfaceRun) -> Tuple[Path, Path]:
 
 
 # ---------------------------------------------------------------------------
+# chatgpt-web  (supervised ChatGPT web-driver harvest, sealed via axm-chat)
+# ---------------------------------------------------------------------------
+
+def _drive_chatgpt_web(run: SurfaceRun) -> Tuple[Path, Path]:
+    repo = _resolve_repo(run, "CHATGPT_WEB_REPO", "/workspace/chatgpt-web")
+    if not (repo / "core" / "web_seal.py").exists():
+        raise FileNotFoundError(f"chatgpt-web spoke not found at {repo} (set CHATGPT_WEB_REPO).")
+    out = run.workdir
+    out.mkdir(parents=True, exist_ok=True)
+    p = run.params
+    handoff = p.get("handoff", "")
+    chat_repo = os.environ.get("AXM_CHAT_REPO", "/workspace/axm-chat")
+    genesis_repo = os.environ.get("AXM_GENESIS_REPO", "/workspace/axm-genesis")
+    # Honesty: with no handoff= param there is nothing harvested to seal, so we
+    # seal the spoke's bundled example and say so; only a real handoff path is
+    # a real capture. The sealer itself validates the handoff contract
+    # (hashes, byte counts, manifest-written-last) and detached-verifies the
+    # one produced shard before reporting success.
+    script = f"""
+        import json, sys
+        from pathlib import Path
+        genesis_src = Path({genesis_repo!r}) / "src"
+        if genesis_src.is_dir() and str(genesis_src) not in sys.path:
+            sys.path.insert(0, str(genesis_src))
+        from core.web_seal import seal_handoff
+        out = Path({str(out)!r})
+        handoff_arg = {handoff!r}
+        if handoff_arg:
+            handoff_dir = Path(handoff_arg)
+        else:
+            handoff_dir = Path("examples/flat-message-list")
+            print("note: no handoff= param given; sealing the spoke's bundled example "
+                  "handoff (examples/flat-message-list) -- a labeled sample, NOT a "
+                  "real ChatGPT web harvest.")
+        result = seal_handoff(handoff_dir, out / "sealed", Path({chat_repo!r}))
+        print(json.dumps(result))
+    """
+    return _run_in_spoke(repo, script, f"chatgpt-web spoke / axm-chat not available at {repo}")
+
+
+# ---------------------------------------------------------------------------
 # registry
 # ---------------------------------------------------------------------------
 
@@ -333,6 +374,12 @@ register(Surface(
     tier="sim-foundry-s3", status=Status.DRIVEN,
     summary="A Foundry S3 export (simulated surface) pulled, checksummed, and sealed as an exit bundle.",
     driver=_drive_foundry_export,
+))
+register(Surface(
+    name="chatgpt-web", verb="capture", owner_repo="chatgpt-web",
+    tier="chat_conversation_shard", status=Status.DRIVEN,
+    summary="A completed ChatGPT web-driver handoff validated, sealed via axm-chat, and detached-verified.",
+    driver=_drive_chatgpt_web,
 ))
 register(Surface(
     name="ontology-exit", verb="capture", owner_repo="axm-core",
